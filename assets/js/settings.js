@@ -121,7 +121,7 @@ function cloakMe(o) {
             break;
         case "none":
             tabIcon.href = "/image.png";
-            document.title = "canc3r";
+            document.title = "C3";
             localStorage.setItem("canc3r_cloakIcon", tabIcon.href);
             localStorage.setItem("canc3r_cloakTitle", document.title);
             break;

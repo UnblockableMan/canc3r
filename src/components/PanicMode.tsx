@@ -30,7 +30,7 @@ export function PanicMode() {
   // is replaced. Also drop the page title + favicon to match.
   useEffect(() => {
     if (!panicMode) {
-      document.title = "redux.";
+      document.title = "C3.";
       return;
     }
     const titles: Record<string, string> = {
@@ -99,7 +99,7 @@ export function PanicMode() {
         pointerEvents: "none",
         userSelect: "none",
       }}>
-        redux panic mode — press Esc or Ctrl+P to exit
+        C3 panic mode — press Esc or Ctrl+P to exit
       </div>
     </div>
   );

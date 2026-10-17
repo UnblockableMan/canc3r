@@ -74,7 +74,7 @@ export function VideoWallpaper() {
         />
       )}
       {wallpaper === "stars" && (
-        <div ref={particleRef} id="redux-particles" className="absolute inset-0" />
+        <div ref={particleRef} id="c3-particles" className="absolute inset-0" />
       )}
       <div className="absolute inset-0" style={{ background: "rgba(0,0,0,0.25)" }} />
     </div>

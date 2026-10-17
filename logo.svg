@@ -1,7 +1,7 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 280 80" width="280" height="80" role="img" aria-labelledby="title">
-  <title id="title">canc3r — return to homepage</title>
-  <a href="/" target="_top" aria-label="Open the canc3r homepage">
-    <text x="8" y="62" font-family="Georgia, 'Times New Roman', serif" font-size="66" font-style="italic" fill="#fff">canc3r</text>
-    <circle cx="266" cy="54" r="5" fill="#9a8cf5"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 110 80" width="110" height="80" role="img" aria-labelledby="title">
+  <title id="title">C3 by canc3r — return to homepage</title>
+  <a href="/" target="_top" aria-label="Open the C3 homepage by canc3r">
+    <text x="8" y="62" font-family="Georgia, 'Times New Roman', serif" font-size="66" font-style="italic" fill="#fff">C3</text>
+    <circle cx="98" cy="54" r="5" fill="#9a8cf5"/>
   </a>
 </svg>
