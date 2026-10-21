@@ -1,9 +1,41 @@
 const GAME_INDEX = "https://cdn.jsdelivr.net/gh/gmshelf/seraph/seraph.json";
 const GAME_CDN = "https://cdn.jsdelivr.net/gh/gmshelf/seraph/";
 const CONFIG_KEY = "c3-service-config-v2";
+const APPEARANCE_KEY = "c3-appearance-v1";
+const THEMES = {
+  c3: "C3 Pink",
+  magenta: "Magenta",
+  midnight: "Midnight",
+  void: "Void",
+  cyberpunk: "Cyberpunk",
+  arctic: "Arctic",
+  neon: "Neon",
+  ocean: "Ocean",
+  forest: "Forest",
+  sunset: "Sunset",
+};
+const APP_CATALOG = [
+  { name: "YouTube", image: "yt.png", url: "https://youtube.com", category: "Video" },
+  { name: "Spotify", image: "spotify.png", url: "https://open.spotify.com", category: "Music" },
+  { name: "Discord", image: "discord.jpg", url: "https://discord.com/app", category: "Social" },
+  { name: "ChatGPT", image: "chatgpt.png", url: "https://chatgpt.com", category: "AI" },
+  { name: "Gemini", image: "gemini.webp", url: "https://gemini.google.com", category: "AI" },
+  { name: "Reddit", image: "reddit.png", url: "https://reddit.com", category: "Community" },
+  { name: "GitHub", image: "github.png", url: "https://github.com", category: "Development" },
+  { name: "Twitch", image: "twitch-tv.png", url: "https://twitch.tv", category: "Video" },
+  { name: "Roblox", image: "roblox.webp", url: "https://roblox.com", category: "Games" },
+  { name: "Scratch", image: "scratch.webp", url: "https://scratch.mit.edu", category: "Create" },
+  { name: "Pixlr", image: "pixlr.jpeg", url: "https://pixlr.com", category: "Create" },
+  { name: "Google", image: "google.png", url: "https://google.com", category: "Search" },
+  { name: "Netflix", image: "netflix.png", url: "https://netflix.com", category: "Video" },
+  { name: "VS Code", image: "vscode.png", url: "https://vscode.dev", category: "Development" },
+  { name: "Pinterest", image: "pinterest.png", url: "https://pinterest.com", category: "Discover" },
+  { name: "WhatsApp", image: "whatsapp.png", url: "https://web.whatsapp.com", category: "Social" },
+];
 const views = {
   home: "Home",
   games: "Games",
+  apps: "Apps",
   movies: "Movies & TV",
   manga: "Manga",
   music: "Music",
@@ -31,8 +63,47 @@ const state = {
   musicQuery: "",
   musicTrack: null,
   config: loadConfig(),
+  appearance: loadAppearance(),
   hlsPromise: null,
 };
+
+function loadAppearance() {
+  const fallback = { theme: "c3", fog: true, aurora: false };
+  try {
+    const stored = JSON.parse(localStorage.getItem(APPEARANCE_KEY) || "{}");
+    return {
+      theme: Object.hasOwn(THEMES, stored.theme) ? stored.theme : fallback.theme,
+      fog: typeof stored.fog === "boolean" ? stored.fog : fallback.fog,
+      aurora: typeof stored.aurora === "boolean" ? stored.aurora : fallback.aurora,
+    };
+  } catch (error) {
+    console.error("Unable to read saved appearance settings.", error);
+    return fallback;
+  }
+}
+
+function saveAppearance() {
+  try {
+    localStorage.setItem(APPEARANCE_KEY, JSON.stringify(state.appearance));
+  } catch (error) {
+    console.error("Unable to save appearance settings.", error);
+    showToast("Could not save appearance settings. Check browser storage permissions.");
+  }
+}
+
+function applyAppearance() {
+  const themeStylesheet = document.querySelector("#theme-stylesheet");
+  const selectedTheme = Object.hasOwn(THEMES, state.appearance.theme) ? state.appearance.theme : "c3";
+  if (selectedTheme === "c3") {
+    themeStylesheet.disabled = true;
+  } else {
+    themeStylesheet.href = `/assets/css/themes/${selectedTheme}.css`;
+    themeStylesheet.disabled = false;
+  }
+  document.body.classList.toggle("fog-enabled", state.appearance.fog);
+  document.body.classList.toggle("aurora-enabled", state.appearance.aurora);
+  document.body.dataset.theme = selectedTheme;
+}
 
 function loadConfig() {
   try {
@@ -95,6 +166,10 @@ function renderHome() {
         <button class="button primary" data-go="games">Explore games <span aria-hidden="true">↗</span></button>
       </div>
     </section>
+    <section class="quick-launch">
+      <div class="section-heading"><div><h2>Quick launch</h2><p>Your everyday stops, one click away.</p></div><button class="text-button" data-go="apps">All apps ↗</button></div>
+      <div class="quick-apps">${APP_CATALOG.slice(0, 8).map((app) => `<a class="quick-app" href="${app.url}" target="_blank" rel="noopener noreferrer" title="${app.name}"><img src="/assets/img/apps/${app.image}" alt="" loading="lazy"><span>${app.name}</span></a>`).join("")}</div>
+    </section>
     <div class="section-heading"><div><h2>Pick a lane</h2><p>Jump into something good.</p></div></div>
     <section class="feature-grid">
       <button class="feature-card" data-go="games"><span class="feature-arrow">↗</span><span class="feature-icon">✣</span><h3>Play something</h3><p>Browse the Seraph collection, powered by GMShelf.</p></button>
@@ -106,6 +181,26 @@ function renderHome() {
     </section>
     <div class="section-heading"><div><h2>Good to know</h2><p>Some services need your own backend.</p></div></div>
     <div class="notice"><span class="notice-mark">✳</span><div><strong>Connect your services once.</strong> Manga, movie, and music servers are self-hosted APIs, not public endpoints. Add their base URLs in <button class="text-button" data-go="settings">Settings</button>; your values stay in this browser.</div></div>`;
+}
+
+function renderApps(query = "") {
+  viewRoot.innerHTML = `
+    ${sectionHeader("YOUR SHORTCUTS", "Apps", "A collection of useful places from the old C3 app hub. App shortcuts open the official site in a new tab.")}
+    <div class="toolbar"><label class="search-form"><input id="apps-query" type="search" value="${escapeHTML(query)}" placeholder="Find an app..." aria-label="Find an app"></label><span class="pill">${APP_CATALOG.length} shortcuts</span></div>
+    <div id="apps-results">${renderAppCards(query)}</div>`;
+}
+
+function renderAppCards(query = "") {
+  const normalizedQuery = query.trim().toLowerCase();
+  const apps = APP_CATALOG.filter((app) => `${app.name} ${app.category}`.toLowerCase().includes(normalizedQuery));
+  if (!apps.length) return emptyState("No apps found", "Try another search.");
+  return `<div class="app-grid">${apps.map((app) => `
+    <a class="app-card" href="${app.url}" target="_blank" rel="noopener noreferrer">
+      <span class="app-card-open" aria-hidden="true">↗</span>
+      <img src="/assets/img/apps/${app.image}" alt="" loading="lazy">
+      <span class="app-card-name">${escapeHTML(app.name)}</span>
+      <span class="app-card-category">${escapeHTML(app.category)}</span>
+    </a>`).join("")}</div>`;
 }
 
 function renderGames() {
@@ -168,7 +263,7 @@ function launchGame(url, name) {
   }
   const dialog = document.createElement("dialog");
   dialog.className = "player-dialog game-dialog";
-  dialog.innerHTML = `<div class="dialog-top"><div><span class="eyebrow">SERAPH · GMSHELF</span><h2>${escapeHTML(name)}</h2></div><button class="icon-button dialog-close" aria-label="Close game">×</button></div><iframe title="${escapeHTML(name)}" src="${escapeHTML(safeUrl.href)}" allow="fullscreen; autoplay; gamepad; clipboard-read; clipboard-write" allowfullscreen style="display:block;width:100%;height:min(70vh,720px);border:0;border-radius:10px;background:#08070a"></iframe>`;
+  dialog.innerHTML = `<div class="dialog-top"><div><span class="eyebrow">SERAPH · GMSHELF</span><h2>${escapeHTML(name)}</h2></div><button class="icon-button dialog-close" aria-label="Close game">×</button></div><iframe class="game-frame" title="${escapeHTML(name)}" src="${escapeHTML(safeUrl.href)}" allow="fullscreen; autoplay; gamepad; clipboard-read; clipboard-write" allowfullscreen></iframe>`;
   document.body.append(dialog);
   dialog.querySelector(".dialog-close").addEventListener("click", () => dialog.close());
   dialog.addEventListener("close", () => dialog.remove(), { once: true });
@@ -289,7 +384,7 @@ async function openTvDetails(id, title) {
     if (!seasons.length) throw new Error("The TV details response contains no seasons.");
     content.dataset.tvId = String(id);
     content.dataset.tvTitle = title;
-    content.innerHTML = `<div class="toolbar"><label class="field" style="min-width:180px;margin:0"><span class="small-note">Season</span><select id="tv-season">${seasons.map((season) => `<option value="${escapeHTML(season.season_number ?? season.number)}">${escapeHTML(season.name || `Season ${season.season_number ?? season.number}`)}</option>`).join("")}</select></label></div><div id="tv-episodes" class="loading-state">Loading episodes…</div>`;
+    content.innerHTML = `<div class="toolbar"><label class="field season-field"><span class="small-note">Season</span><select id="tv-season">${seasons.map((season) => `<option value="${escapeHTML(season.season_number ?? season.number)}">${escapeHTML(season.name || `Season ${season.season_number ?? season.number}`)}</option>`).join("")}</select></label></div><div id="tv-episodes" class="loading-state">Loading episodes…</div>`;
     await loadTvEpisodes(id, seasons[0].season_number ?? seasons[0].number);
   } catch (error) {
     renderServiceError(content, error, "Check the TV details endpoint and server.");
@@ -527,7 +622,7 @@ function renderCloud() {
     ${sectionHeader("LOW-LATENCY PLAY", "Cloud games", "Stratus is a backend building block for RaccoonGame sessions and WebRTC signaling, not a browser-ready game catalogue API.")}
     <div class="notice"><span class="notice-mark">!</span><div><strong>This needs a server-side host.</strong> Stratus creates and manages sessions; its repository does not define a stable public REST endpoint for a standalone frontend. Do not expose session tokens, account setup, or server secrets in browser code.</div></div>
     <section class="cloud-panel">
-      <article class="settings-card"><span class="eyebrow">STRATUS API</span><h2>Connect a compatible host</h2><p>Use the upstream project as the server-side session layer, then connect C3 to a trusted host application that implements its own client API and WebRTC signaling.</p><a class="button primary" href="https://github.com/x8rr/stratus-api" target="_blank" rel="noreferrer">View Stratus API ↗</a><p class="small-note" style="margin-top:13px">Stratus setup requires its documented dependencies and an operator-managed backend. Self-host only services you are authorized to use.</p></article>
+      <article class="settings-card"><span class="eyebrow">STRATUS API</span><h2>Connect a compatible host</h2><p>Use the upstream project as the server-side session layer, then connect C3 to a trusted host application that implements its own client API and WebRTC signaling.</p><a class="button primary" href="https://github.com/x8rr/stratus-api" target="_blank" rel="noreferrer">View Stratus API ↗</a><p class="small-note spaced-note">Stratus setup requires its documented dependencies and an operator-managed backend. Self-host only services you are authorized to use.</p></article>
       <article class="settings-card"><span class="eyebrow">WHY IT IS NOT A URL FIELD</span><h2>No generic browser endpoint</h2><ol class="step-list"><li><b>1</b><span>Deploy and secure your own Stratus-compatible server.</span></li><li><b>2</b><span>Provide a frontend adapter for game discovery, session creation, and signaling.</span></li><li><b>3</b><span>Add that documented adapter when its interface is available.</span></li></ol></article>
     </section>`;
 }
@@ -544,13 +639,18 @@ function renderSettings() {
   viewRoot.innerHTML = `
     ${sectionHeader("PREFERENCES", "Settings", "Connect self-hosted APIs. Service URLs are stored in this browser only; no API secrets are stored here.")}
     <form id="settings-form" class="settings-grid">
+      <section class="settings-card appearance-card"><span class="eyebrow">MAKE IT YOURS</span><h2>Appearance</h2><p>Choose a palette and ambient effects. Your preferences are saved on this device.</p>
+        <div class="field"><label for="theme-choice">Color theme</label><select id="theme-choice" name="theme">${Object.entries(THEMES).map(([key, label]) => `<option value="${key}">${label}</option>`).join("")}</select></div>
+        <label class="toggle-row" for="fog-toggle"><span><strong>Soft fog</strong><small>Slow drifting mist around the edges</small></span><input id="fog-toggle" type="checkbox" name="fog"><span class="toggle-switch" aria-hidden="true"></span></label>
+        <label class="toggle-row" for="aurora-toggle"><span><strong>Aurora glow</strong><small>Use the retained ambient aurora effect</small></span><input id="aurora-toggle" type="checkbox" name="aurora"><span class="toggle-switch" aria-hidden="true"></span></label>
+      </section>
       <section class="settings-card"><h2>API connections</h2><p>Enter the origin for each self-hosted backend. Use a URL reachable from this browser; the backend must allow requests from this site.</p>
         ${settingField("manga", "Manga API", "x8rr/manga · e.g. http://localhost:3000")}
         ${settingField("movies", "Movies API", "x8rr/movies · e.g. http://localhost:3000")}
         ${settingField("music", "Music API", "x8rr/music · e.g. http://localhost:2010")}
         <div class="settings-actions"><button class="button primary" type="submit">Save connections</button><button class="button" type="button" data-clear-config>Clear</button></div>
       </section>
-      <section class="settings-card"><h2>Local setup notes</h2><p>These projects are backends you run and administer; the GitHub links are source code, not API origins.</p>
+      <section class="settings-card setup-card"><h2>Local setup notes</h2><p>These projects are backends you run and administer; the GitHub links are source code, not API origins.</p>
         <p><a href="https://github.com/x8rr/manga" target="_blank" rel="noreferrer">Manga backend docs ↗</a><br><span class="small-note">Bun service; defaults to port 3000.</span></p>
         <p><a href="https://github.com/x8rr/movies" target="_blank" rel="noreferrer">Movies backend docs ↗</a><br><span class="small-note">Self-hosted service; needs your own TMDB API key.</span></p>
         <p><a href="https://github.com/x8rr/music" target="_blank" rel="noreferrer">Music backend docs ↗</a><br><span class="small-note">Bun, yt-dlp, and a configured YouTube Music base are needed for playback.</span></p>
@@ -559,8 +659,11 @@ function renderSettings() {
     </form>
     <div class="notice"><span class="notice-mark">✳</span><div>Game listings load directly from <a href="https://github.com/gmshelf/seraph" target="_blank" rel="noreferrer">GMShelf's Seraph index</a>. Cloud games and extensions need their own server/runtime integration; see their sections for details.</div></div>`;
   document.querySelectorAll("#settings-form input").forEach((input) => {
-    input.value = state.config[input.name] || "";
+    if (input.name in state.config) input.value = state.config[input.name] || "";
   });
+  document.querySelector("#theme-choice").value = state.appearance.theme;
+  document.querySelector("#fog-toggle").checked = state.appearance.fog;
+  document.querySelector("#aurora-toggle").checked = state.appearance.aurora;
 }
 
 function settingField(name, label, hint) {
@@ -575,6 +678,7 @@ function serviceNotice(service, repo, message) {
 function renderView() {
   switch (state.view) {
     case "games": renderGames(); break;
+    case "apps": renderApps(); break;
     case "movies": renderMovies(); break;
     case "manga": renderManga(); break;
     case "music": renderMusic(); break;
@@ -586,7 +690,7 @@ function renderView() {
 }
 
 function emptyState(title, description, action = "") {
-  return `<div class="empty-state"><strong>${escapeHTML(title)}</strong><p>${escapeHTML(description)}</p>${action ? `<div style="margin-top:12px">${action}</div>` : ""}</div>`;
+  return `<div class="empty-state"><strong>${escapeHTML(title)}</strong><p>${escapeHTML(description)}</p>${action ? `<div class="empty-action">${action}</div>` : ""}</div>`;
 }
 
 function listFrom(data, preferred = []) {
@@ -698,6 +802,14 @@ document.addEventListener("change", (event) => {
   if (event.target.id === "tv-season") {
     const id = document.querySelector("#detail-content").dataset.tvId;
     loadTvEpisodes(id, event.target.value);
+  } else if (event.target.id === "theme-choice") {
+    state.appearance.theme = Object.hasOwn(THEMES, event.target.value) ? event.target.value : "c3";
+    applyAppearance();
+    saveAppearance();
+  } else if (event.target.id === "fog-toggle" || event.target.id === "aurora-toggle") {
+    state.appearance[event.target.name] = event.target.checked;
+    applyAppearance();
+    saveAppearance();
   }
 });
 
@@ -750,6 +862,18 @@ globalSearch.addEventListener("input", () => {
   } else if (state.view === "music" && state.config.music) {
     clearTimeout(globalSearch.timer);
     globalSearch.timer = setTimeout(() => loadMusic(input), 280);
+  } else if (state.view === "apps") {
+    const queryInput = document.querySelector("#apps-query");
+    if (queryInput) queryInput.value = input;
+    const results = document.querySelector("#apps-results");
+    if (results) results.innerHTML = renderAppCards(input);
+  }
+});
+
+document.addEventListener("input", (event) => {
+  if (event.target.id === "apps-query") {
+    const results = document.querySelector("#apps-results");
+    if (results) results.innerHTML = renderAppCards(event.target.value);
   }
 });
 
@@ -775,4 +899,5 @@ document.querySelector("#audio-player").addEventListener("error", () => {
 });
 
 const initialView = location.hash.slice(1);
+applyAppearance();
 setView(views[initialView] ? initialView : "home");

@@ -12,40 +12,33 @@
     <meta name="twitter:image" content="/image.png">
     <link rel="icon" type="image/png" href="/image.png">
     <link rel="apple-touch-icon" href="/image.png">
+    <link id="theme-stylesheet" rel="stylesheet" href="/assets/css/themes/magenta.css" disabled>
     <link rel="stylesheet" href="/style.css">
+    <link rel="stylesheet" href="/assets/css/effects.css">
     <title>C3</title>
     <script src="/app.js" defer></script>
   </head>
   <body>
+    <div id="fog-effect" aria-hidden="true"></div>
+    <div id="aurora-effect" aria-hidden="true"></div>
     <div class="app-shell">
-      <aside class="sidebar">
-        <a class="brand" href="#home" aria-label="C3 home">
-          <img src="/image.png" alt="" class="brand-icon">
-          <span>C<span class="brand-pink">3</span></span>
-        </a>
-        <div class="side-label">LIBRARY</div>
-        <nav class="main-nav" aria-label="Main navigation">
-          <button class="nav-item active" data-view="home"><span class="nav-icon">⌂</span>Home</button>
-          <button class="nav-item" data-view="games"><span class="nav-icon">✣</span>Games</button>
-          <button class="nav-item" data-view="movies"><span class="nav-icon">▣</span>Movies &amp; TV</button>
-          <button class="nav-item" data-view="manga"><span class="nav-icon">▤</span>Manga</button>
-          <button class="nav-item" data-view="music"><span class="nav-icon">♫</span>Music</button>
-          <button class="nav-item" data-view="cloud"><span class="nav-icon">⌁</span>Cloud games</button>
-        </nav>
-        <div class="side-label side-label-spaced">MORE</div>
-        <nav class="main-nav" aria-label="More">
-          <button class="nav-item" data-view="extensions"><span class="nav-icon">⊞</span>Extensions</button>
-          <button class="nav-item" data-view="settings"><span class="nav-icon">⚙</span>Settings</button>
-        </nav>
-        <div class="sidebar-bottom">
-          <span class="status-dot"></span>
-          <span>PERSONAL HUB <b>·</b> C3</span>
-          <small>v2.0</small>
-        </div>
-      </aside>
-
       <main class="main-area">
         <header class="topbar">
+          <a class="brand" href="#home" aria-label="C3 home">
+            <img src="/image.png" alt="" class="brand-icon">
+            <span>C<span class="brand-pink">3</span></span>
+          </a>
+          <nav class="main-nav" aria-label="Main navigation">
+            <button class="nav-item active" data-view="home"><span class="nav-icon">⌂</span>Home</button>
+            <button class="nav-item" data-view="games"><span class="nav-icon">✣</span>Games</button>
+            <button class="nav-item" data-view="apps"><span class="nav-icon">▦</span>Apps</button>
+            <button class="nav-item" data-view="movies"><span class="nav-icon">▣</span>Movies &amp; TV</button>
+            <button class="nav-item" data-view="manga"><span class="nav-icon">▤</span>Manga</button>
+            <button class="nav-item" data-view="music"><span class="nav-icon">♫</span>Music</button>
+            <button class="nav-item" data-view="cloud"><span class="nav-icon">⌁</span>Cloud games</button>
+            <button class="nav-item" data-view="extensions"><span class="nav-icon">⊞</span>Extensions</button>
+            <button class="nav-item" data-view="settings"><span class="nav-icon">⚙</span>Settings</button>
+          </nav>
           <div class="breadcrumb"><span>canc3r</span><i>/</i><strong id="current-section">Home</strong></div>
           <div class="top-actions">
             <label class="global-search">

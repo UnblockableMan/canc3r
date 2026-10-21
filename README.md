@@ -23,6 +23,10 @@ Visit <http://localhost:8000>. No frontend build or package installation is requ
 
 Service URLs are saved in this browser's local storage. Backends must be reachable from the browser and allow CORS requests from the C3 origin. Do not put private API keys in frontend settings.
 
+The Settings page also includes color themes from the retained `assets/css/themes/` collection, a lightweight CSS fog layer, and the retained aurora effect. Appearance preferences are saved locally in this browser.
+
+The Apps toolbar section restores curated shortcuts from the previous C3 hub. Home also provides a quick-launch strip for frequently used apps; external shortcuts open the app's official site in a new tab.
+
 ## License and retained assets
 
 The original repository license is retained in [LICENSE](./LICENSE). The pre-existing `assets/` directory and root `image.png` are kept intact; consult notices included with those resources for their individual terms.

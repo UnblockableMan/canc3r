@@ -148,7 +148,7 @@ const allDecoyOptions = [
 ];
 
 const wispPresets = {
-  rhw: { url: "wss://wisp.rhw.one/" },
+  rhw: { url: "wss://wisp.mercurywork.shop/" },
   
 };
 
