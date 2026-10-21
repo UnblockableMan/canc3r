@@ -1,6 +1,6 @@
 const splashes = [
   "wsp",
-  "made by sxlum",
+  "made by x8r",
   "im hungry",
   "w speed",
   "scramjet > ultraviolet",

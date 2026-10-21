@@ -2,15 +2,7 @@ const sections = document.querySelectorAll(".settings-section");
 const buttons = document.querySelectorAll(".settings-side button");
 const wispServers = document.querySelectorAll(".wisp-servers button")
 const currentWisp = document.getElementById("currentWisp");
-const defaultWispUrl = "wss://wisp.mercurywork.shop/";
-const storedWispUrl = localStorage.getItem("canc3r_wispUrl");
-const savedWisp =
-    storedWispUrl && storedWispUrl !== "wss://wisp.rhw.one/"
-        ? storedWispUrl
-        : defaultWispUrl;
-if (storedWispUrl !== savedWisp) {
-    localStorage.setItem("canc3r_wispUrl", savedWisp);
-}
+const savedWisp = localStorage.getItem("canc3r_wispUrl") ?? "wss://wisp.rhw.one/";
 const savedCloak = localStorage.getItem("canc3r_cloak") ?? "";
 const savedCloakIcon = localStorage.getItem("canc3r_cloakIcon") ?? "";
 const savedCloakTitle = localStorage.getItem("canc3r_cloakTitle") ?? "";
