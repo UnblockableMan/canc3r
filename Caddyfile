@@ -1,9 +1,0 @@
-:81 {
-	root * .
-	encode zstd gzip
-
-	@private path /.env* /.git/* /.github/* /.gitignore /Caddyfile /db/* /download/* /node_modules/* /upload/*
-	respond @private 404
-
-	file_server
-}

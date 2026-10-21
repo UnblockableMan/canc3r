@@ -1,6 +1,0 @@
-services:
-  - type: web
-    name: c3
-    runtime: static
-    buildCommand: python3 scripts/build_cloudflare_pages.py
-    staticPublishPath: ./dist
